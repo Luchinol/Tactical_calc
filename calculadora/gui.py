@@ -45,7 +45,7 @@ class LauncherGUI(tk.Tk):
         self.tree_adversary = ttk.Treeview(frame_adversary)
         self.tree_adversary.heading("#0", text="Estructura de Unidades Adversarias", anchor="w")
         self.tree_adversary.pack(expand=True, fill="both", padx=5, pady=5)
-        # Actualizamos la iteración para la nueva estructura de adversarios:
+        # Se recorre el árbol de la estructura adversaria usando la nueva definición
         for grupo in get_adversary_structure():
             nodo = self.tree_adversary.insert("", "end", text=grupo["unidad_superior"], open=False)
             for sub in grupo["subordinados"]:
@@ -113,6 +113,12 @@ class CalculatorGUI(tk.Toplevel):
         # Botón para abrir la ventana de carga de tropas registradas
         self.btn_cargar_tropas = ttk.Button(self, text="Cargar Tropas Registradas", command=self.abrir_cargar_tropas)
         self.btn_cargar_tropas.grid(row=2, column=0, columnspan=2, pady=10)
+        btn_ahp = ttk.Button(self, text="Evaluar AHP", command=self.abrir_ahp)
+        btn_ahp.grid(row=3, column=0, columnspan=2, pady=10)
+
+    def abrir_ahp(self):
+        from calculadora.ahp import AHPGUI  # Asegúrate de que 'ahp.py' esté en el mismo paquete 'calculadora'
+        AHPGUI(self)
 
     def on_close(self):
         self.destroy()
@@ -224,7 +230,8 @@ class CalculatorGUI(tk.Toplevel):
 # Ventana para Cargar Tropas Registradas
 # Presenta dos pestañas: una con las tropas de Fuerza Propia y otra con la
 # estructura de Fuerza Adversaria (formateada en un Treeview con múltiples columnas).
-# Al seleccionar un registro se asignan valores por defecto a los subfactores.
+# Al seleccionar un registro se asignan los valores predefinidos
+# de AHP cuando estos se encuentran en memoria.
 # ----------------------------------------------------------------------
 class CargarTropasGUI(tk.Toplevel):
     def __init__(self, calculator):
@@ -273,14 +280,18 @@ class CargarTropasGUI(tk.Toplevel):
             return
         data = self.tree_friendly.item(selected[0])["values"]
         try:
-            # Mapeo: se usa el campo "UF" como Tipo y "Cantidad UF" como Cantidad
-            tipo = data[2]  # Campo "UF"
+            # Se utiliza el campo "UF" como Tipo y "Cantidad UF" como Cantidad
+            tipo = data[2]
             cantidad = float(data[3])
         except (IndexError, ValueError):
             messagebox.showerror("Error", "Datos inválidos en la tropa seleccionada.")
             return
-        # Asigna valores por defecto (por ejemplo, 1.0) a los subfactores.
-        nuevos_valores = [tipo, cantidad, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+        # Si la entrada posee valores AHP predefinidos (tupla de al menos 12 elementos), se usan esos
+        if len(data) >= 12:
+            subfactores = list(data[6:12])
+        else:
+            subfactores = [1.0] * 6
+        nuevos_valores = [tipo, cantidad] + subfactores
         self.calculator.inputs_own["tree"].insert("", "end", values=nuevos_valores)
         self.calculator.recalcular_totales()
         messagebox.showinfo("Carga Exitosa", "Tropa de Fuerza Propia cargada a la Calculadora.")
@@ -302,7 +313,7 @@ class CargarTropasGUI(tk.Toplevel):
             for sub in grupo["subordinados"]:
                 values = (
                     sub.get("unidad_subordinada", ""),
-                    sub.get("pequena_unidad", ""),
+                    sub.get("pequeña_unidad", ""),
                     sub.get("cantidad", ""),
                     sub.get("tipo_medios", ""),
                     sub.get("cantidad_medios_por_uf", "")
@@ -330,7 +341,17 @@ class CargarTropasGUI(tk.Toplevel):
         else:
             tipo = item_data["text"]
         cantidad = 1.0  # Valor por defecto
-        nuevos_valores = [tipo, cantidad, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+        # Buscar en la estructura de tropas adversarias los valores AHP predefinidos para la unidad
+        from calculadora.tropas import get_adversary_structure
+        ahp_values = [1.0] * 6
+        estructura = get_adversary_structure()
+        for grupo in estructura:
+            for sub in grupo.get("subordinados", []):
+                if sub.get("unidad_subordinada", "") == tipo:
+                    if "ahp" in sub and sub["ahp"] is not None:
+                        ahp_values = sub["ahp"]
+                        break
+        nuevos_valores = [tipo, cantidad] + ahp_values
         self.calculator.inputs_adv["tree"].insert("", "end", values=nuevos_valores)
         self.calculator.recalcular_totales()
         messagebox.showinfo("Carga Exitosa", "Tropa de Fuerza Adversaria cargada a la Calculadora.")

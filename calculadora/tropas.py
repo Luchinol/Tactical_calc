@@ -1,31 +1,40 @@
 # tropas.py
 
-# Datos de Fuerzas Propias (detalladas)
+# Datos de Fuerzas Propias (detalladas) con parámetros AHP extendidos
+# Cada tupla contiene:
+# (Unidad Superior, Unidades Subordinadas, UF, Cantidad UF, Tipo de Medios, Cantidad Medios/U.F.,
+#  Movilidad, Combate Nocturno, Celeridad, Flexibilidad, Integracion Medios, Integracion Apoyos)
 friendly_forces = [
-    ("Grupo Acorazado Ligero", "Compañía Infantería Mecanizada", "Compañía", 1, "Carros M-113", 13),
-    ("", "Escuadrón de Tanques Leo 1", "Escuadrón", 2, "Tanques leopard 1", 26),
-    ("Sección Telecomunicaciones", "Cuadrilla de Telecomunicaciones Comando", "Subcuadrilla", 2, "Camión Liviano", 2),
-    ("", "Cuadrilla de Telecomunicaciones Combate", "Subcuadrilla", 1, "Camión Liviano", 1)
+    ("Grupo Acorazado Ligero", "Compañía Infantería Mecanizada", "Compañía", 1, "Carros M-113", 13,
+     3.0, 4.0, 3.0, 3.0, 4.0, 4.0),
+    ("", "Escuadrón de Tanques Leo 1", "Escuadrón", 2, "Tanques leopard 1", 26,
+     4.0, 4.0, 4.0, 3.5, 4.0, 4.0),
+    ("Sección Telecomunicaciones", "Cuadrilla de Telecomunicaciones Comando", "Subcuadrilla", 2, "Camión Liviano", 2,
+     2.5, 3.0, 2.0, 4.0, 3.0, 3.0),
+    ("", "Cuadrilla de Telecomunicaciones Combate", "Subcuadrilla", 1, "Camión Liviano", 1,
+     2.5, 3.0, 2.0, 4.0, 3.0, 3.0)
 ]
 
-# Datos de Fuerzas Adversarias (estructura detallada y actualizada)
+# Datos de Fuerzas Adversarias (estructura detallada y actualizada con valores AHP)
 adversary_structure = [
     {
         "unidad_superior": "DIVISIÓN 'LINARES'",
         "subordinados": [
             {
                 "unidad_subordinada": "Batallón de transmisiones de Zona N°5050",
-                "pequena_unidad": "Compañía",
+                "pequeña_unidad": "Compañía",
                 "cantidad": None,
                 "tipo_medios": None,
-                "cantidad_medios_por_uf": None
+                "cantidad_medios_por_uf": None,
+                "ahp": [2.0, 2.0, 2.0, 2.5, 2.0, 2.0]
             },
             {
                 "unidad_subordinada": "Batallón de Ingenieros N°5040",
-                "pequena_unidad": "Compañía",
+                "pequeña_unidad": "Compañía",
                 "cantidad": 2,
                 "tipo_medios": None,
-                "cantidad_medios_por_uf": None
+                "cantidad_medios_por_uf": None,
+                "ahp": [3.0, 3.0, 3.0, 3.5, 3.0, 3.0]
             }
         ]
     },
@@ -34,45 +43,51 @@ adversary_structure = [
         "subordinados": [
             {
                 "unidad_subordinada": "Batallón de tanques N°5120",
-                "pequena_unidad": "Compañía",
+                "pequeña_unidad": "Compañía",
                 "cantidad": 3,
                 "tipo_medios": "Tanque T-55",
-                "cantidad_medios_por_uf": 14
+                "cantidad_medios_por_uf": 14,
+                "ahp": [4.5, 4.0, 4.5, 4.0, 4.5, 4.0]
             },
             {
                 "unidad_subordinada": "Batallón de Infantería Blindado N°5110",
-                "pequena_unidad": "Compañía",
+                "pequeña_unidad": "Compañía",
                 "cantidad": 3,
                 "tipo_medios": "VTP",
-                "cantidad_medios_por_uf": 39
+                "cantidad_medios_por_uf": 39,
+                "ahp": [3.5, 3.5, 3.0, 3.0, 3.5, 3.0]
             },
             {
                 "unidad_subordinada": "Batallón de Infantería Blindado N°5111",
-                "pequena_unidad": "Compañía",
+                "pequeña_unidad": "Compañía",
                 "cantidad": 3,
                 "tipo_medios": "VTP",
-                "cantidad_medios_por_uf": 39
+                "cantidad_medios_por_uf": 39,
+                "ahp": [3.5, 3.5, 3.0, 3.0, 3.5, 3.0]
             },
             {
                 "unidad_subordinada": "Batallón de Infantería Blindado N°5112",
-                "pequena_unidad": "Compañía",
+                "pequeña_unidad": "Compañía",
                 "cantidad": 3,
                 "tipo_medios": "VTP",
-                "cantidad_medios_por_uf": 39
+                "cantidad_medios_por_uf": 39,
+                "ahp": [3.5, 3.5, 3.0, 3.0, 3.5, 3.0]
             },
             {
                 "unidad_subordinada": "Regimiento de Caballería Blindada N°5125",
-                "pequena_unidad": "Escuadrones",
+                "pequeña_unidad": "Escuadrones",
                 "cantidad": 3,
                 "tipo_medios": "Tanque T-55",
-                "cantidad_medios_por_uf": 44
+                "cantidad_medios_por_uf": 44,
+                "ahp": [4.0, 4.0, 4.0, 3.5, 4.0, 4.0]
             },
             {
                 "unidad_subordinada": "Batallón Ingenieros de combate N°5141",
-                "pequena_unidad": "Compañía",
+                "pequeña_unidad": "Compañía",
                 "cantidad": 2,
                 "tipo_medios": None,
-                "cantidad_medios_por_uf": None
+                "cantidad_medios_por_uf": None,
+                "ahp": [3.0, 3.0, 3.0, 3.5, 3.0, 3.0]
             }
         ]
     },
@@ -81,52 +96,59 @@ adversary_structure = [
         "subordinados": [
             {
                 "unidad_subordinada": "Batallón de tanques N°5121",
-                "pequena_unidad": "Compañía",
+                "pequeña_unidad": "Compañía",
                 "cantidad": 3,
                 "tipo_medios": "Tanque T-55",
-                "cantidad_medios_por_uf": 14
+                "cantidad_medios_por_uf": 14,
+                "ahp": [4.5, 4.0, 4.5, 4.0, 4.5, 4.0]
             },
             {
                 "unidad_subordinada": "Batallón de Infantería Blindado N°5113",
-                "pequena_unidad": "Compañía",
+                "pequeña_unidad": "Compañía",
                 "cantidad": 3,
                 "tipo_medios": "VTP",
-                "cantidad_medios_por_uf": 39
+                "cantidad_medios_por_uf": 39,
+                "ahp": [3.5, 3.5, 3.0, 3.0, 3.5, 3.0]
             },
             {
                 "unidad_subordinada": "Batallón de Infantería Blindado N°5114",
-                "pequena_unidad": "Compañía",
+                "pequeña_unidad": "Compañía",
                 "cantidad": 3,
                 "tipo_medios": "VTP",
-                "cantidad_medios_por_uf": 39
+                "cantidad_medios_por_uf": 39,
+                "ahp": [3.5, 3.5, 3.0, 3.0, 3.5, 3.0]
             },
             {
                 "unidad_subordinada": "Batallón de Infantería Blindado N°5115",
-                "pequena_unidad": "Compañía",
+                "pequeña_unidad": "Compañía",
                 "cantidad": 3,
                 "tipo_medios": "VTP",
-                "cantidad_medios_por_uf": 39
+                "cantidad_medios_por_uf": 39,
+                "ahp": [3.5, 3.5, 3.0, 3.0, 3.5, 3.0]
             },
             {
                 "unidad_subordinada": "Regimiento de Caballería Blindada N°5226",
-                "pequena_unidad": "Escuadrones",
+                "pequeña_unidad": "Escuadrones",
                 "cantidad": 3,
                 "tipo_medios": "Tanque T-55",
-                "cantidad_medios_por_uf": 44
+                "cantidad_medios_por_uf": 44,
+                "ahp": [4.0, 4.0, 4.0, 3.5, 4.0, 4.0]
             },
             {
                 "unidad_subordinada": "Batallón Ingenieros de combate N°5142",
-                "pequena_unidad": "Compañía",
+                "pequeña_unidad": "Compañía",
                 "cantidad": 2,
                 "tipo_medios": None,
-                "cantidad_medios_por_uf": None
+                "cantidad_medios_por_uf": None,
+                "ahp": [3.0, 3.0, 3.0, 3.5, 3.0, 3.0]
             },
             {
                 "unidad_subordinada": "Compañía de transmisiones N°5252",
-                "pequena_unidad": None,
+                "pequeña_unidad": None,
                 "cantidad": None,
                 "tipo_medios": None,
-                "cantidad_medios_por_uf": None
+                "cantidad_medios_por_uf": None,
+                "ahp": [2.0, 2.0, 2.0, 2.5, 2.0, 2.0]
             }
         ]
     },
@@ -135,45 +157,51 @@ adversary_structure = [
         "subordinados": [
             {
                 "unidad_subordinada": "Batallón de tanques N°5123",
-                "pequena_unidad": "Compañía",
+                "pequeña_unidad": "Compañía",
                 "cantidad": 3,
                 "tipo_medios": "Tanque T-55",
-                "cantidad_medios_por_uf": 14
+                "cantidad_medios_por_uf": 14,
+                "ahp": [4.5, 4.0, 4.5, 4.0, 4.5, 4.0]
             },
             {
                 "unidad_subordinada": "Regimiento de Caballería Blindada N°5316",
-                "pequena_unidad": "Escuadrones",
+                "pequeña_unidad": "Escuadrones",
                 "cantidad": 3,
                 "tipo_medios": "Tanque T-55",
-                "cantidad_medios_por_uf": 44
+                "cantidad_medios_por_uf": 44,
+                "ahp": [4.0, 4.0, 4.0, 3.5, 4.0, 4.0]
             },
             {
                 "unidad_subordinada": "Regimiento de Caballería Blindada N°5318",
-                "pequena_unidad": "Escuadrones",
+                "pequeña_unidad": "Escuadrones",
                 "cantidad": 3,
                 "tipo_medios": "Tanque T-55",
-                "cantidad_medios_por_uf": 44
+                "cantidad_medios_por_uf": 44,
+                "ahp": [4.0, 4.0, 4.0, 3.5, 4.0, 4.0]
             },
             {
                 "unidad_subordinada": "Regimiento de Caballería Blindada N°5319",
-                "pequena_unidad": "Escuadrones",
+                "pequeña_unidad": "Escuadrones",
                 "cantidad": 3,
                 "tipo_medios": "Tanque T-55",
-                "cantidad_medios_por_uf": 44
+                "cantidad_medios_por_uf": 44,
+                "ahp": [4.0, 4.0, 4.0, 3.5, 4.0, 4.0]
             },
             {
                 "unidad_subordinada": "Batallón Ingenieros de combate N°5344",
-                "pequena_unidad": "Compañía",
+                "pequeña_unidad": "Compañía",
                 "cantidad": 2,
                 "tipo_medios": None,
-                "cantidad_medios_por_uf": None
+                "cantidad_medios_por_uf": None,
+                "ahp": [3.0, 3.0, 3.0, 3.5, 3.0, 3.0]
             },
             {
                 "unidad_subordinada": "Compañía de transmisiones N°5355",
-                "pequena_unidad": None,
+                "pequeña_unidad": None,
                 "cantidad": None,
                 "tipo_medios": None,
-                "cantidad_medios_por_uf": None
+                "cantidad_medios_por_uf": None,
+                "ahp": [2.0, 2.0, 2.0, 2.5, 2.0, 2.0]
             }
         ]
     },
@@ -182,33 +210,36 @@ adversary_structure = [
         "subordinados": [
             {
                 "unidad_subordinada": "Batallón Infantería Blindado",
-                "pequena_unidad": "Compañía",
+                "pequeña_unidad": "Compañía",
                 "cantidad": 3,
                 "tipo_medios": "VTP",
-                "cantidad_medios_por_uf": 39
+                "cantidad_medios_por_uf": 39,
+                "ahp": [3.5, 3.5, 3.0, 3.0, 3.5, 3.0]
             },
             {
                 "unidad_subordinada": "Batallón de Tanques",
-                "pequena_unidad": "Compañía",
+                "pequeña_unidad": "Compañía",
                 "cantidad": 3,
                 "tipo_medios": "Tanque T-55",
-                "cantidad_medios_por_uf": 14
+                "cantidad_medios_por_uf": 14,
+                "ahp": [4.5, 4.0, 4.5, 4.0, 4.5, 4.0]
             },
             {
                 "unidad_subordinada": "Compañía de Ingeneiros Mecanizados",
-                "pequena_unidad": "Sección",
+                "pequeña_unidad": "Sección",
                 "cantidad": 3,
                 "tipo_medios": None,
-                "cantidad_medios_por_uf": None
+                "cantidad_medios_por_uf": None,
+                "ahp": [3.0, 3.0, 3.0, 3.5, 3.0, 3.0]
             }
         ]
     }
 ]
 
 def get_friendly_forces():
-    """Devuelve la lista de fuerzas propias detalladas."""
+    """Devuelve la lista de fuerzas propias detalladas con parámetros AHP extendidos."""
     return friendly_forces
 
 def get_adversary_structure():
-    """Devuelve la estructura jerárquica detallada de las fuerzas adversarias."""
+    """Devuelve la estructura jerárquica detallada de las fuerzas adversarias, con parámetros AHP para cada subordinado."""
     return adversary_structure
