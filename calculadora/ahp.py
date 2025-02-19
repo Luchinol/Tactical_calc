@@ -63,6 +63,16 @@ class AHPGUI(tk.Toplevel):
             "Integracion Apoyos"
         ]
         self.n = len(self.criteria)
+        # Valores precargados para el triángulo superior (para i < j)
+        # Lámina de comparación de valores sugeridos (puedes ajustar estos valores)
+        self.default_matrix = [
+            [None, 1.5, 1.2, 1.0, 0.8, 1.0],
+            [None, None, 1.3, 1.1, 1.0, 1.2],
+            [None, None, None, 1.0, 0.9, 1.1],
+            [None, None, None, None, 1.2, 1.0],
+            [None, None, None, None, None, 0.8],
+            [None, None, None, None, None, None]
+        ]
         self.matrix_widgets = []  # Almacena los widgets de la matriz (Entry o Label)
         self.dark_mode = False
         self._configure_styles()
@@ -74,12 +84,11 @@ class AHPGUI(tk.Toplevel):
         style.configure("Error.TEntry", fieldbackground="pink")
         # Configuración general (por defecto)
         style.configure("TEntry", fieldbackground="white")
-        # Se pueden definir otros estilos si fuese necesario
 
     def create_widgets(self):
-        header = ttk.Label(self, text="Matriz de Comparación por Pares", font=("Arial", 14, "bold"))
+        header = ttk.Label(self, text="Matriz de Comparación por Pares (valores precargados)", font=("Arial", 14, "bold"))
         header.grid(row=0, column=0, columnspan=self.n+1, pady=10)
-        ToolTip(header, "Esta es la matriz para definir comparaciones de los criterios.")
+        ToolTip(header, "Matriz de comparaciones con valores sugeridos para cada criterio.")
 
         # Encabezados de columna con los nombres de los criterios
         for j, crit in enumerate(self.criteria):
@@ -87,7 +96,7 @@ class AHPGUI(tk.Toplevel):
             lbl.grid(row=1, column=j+1, sticky="nsew", padx=1, pady=1)
             ToolTip(lbl, f"Columna para {crit}")
 
-        # Filas: primer columna con el nombre y celdas de la matriz
+        # Filas: primer columna con el nombre de criterio y celdas de la matriz
         for i, crit in enumerate(self.criteria):
             lbl = ttk.Label(self, text=crit, borderwidth=1, relief="solid", padding=5)
             lbl.grid(row=i+2, column=0, sticky="nsew", padx=1, pady=1)
@@ -102,7 +111,9 @@ class AHPGUI(tk.Toplevel):
                     row_widgets.append(entry)
                 elif i < j:
                     entry = ttk.Entry(self, width=7, justify="center")
-                    entry.insert(0, "1")
+                    # Pre-cargar el valor por defecto según la matriz precargada
+                    default_val = self.default_matrix[i][j]
+                    entry.insert(0, str(default_val) if default_val is not None else "1")
                     entry.grid(row=i+2, column=j+1, padx=1, pady=1)
                     ToolTip(entry, f"Ingrese el valor comparativo para {self.criteria[i]} vs {self.criteria[j]}")
                     row_widgets.append(entry)
@@ -114,7 +125,7 @@ class AHPGUI(tk.Toplevel):
 
         btn_calc = ttk.Button(self, text="Calcular AHP", command=self.calcular_ahp)
         btn_calc.grid(row=self.n+3, column=0, columnspan=self.n+1, pady=10)
-        ToolTip(btn_calc, "Calcula los pesos utilizando el método AHP y muestra una gráfica de barras.")
+        ToolTip(btn_calc, "Calcula los pesos utilizando el método AHP y muestra la gráfica de barras.")
 
         self.label_result = ttk.Label(self, text="Pesos: ", font=("Arial", 12))
         self.label_result.grid(row=self.n+4, column=0, columnspan=self.n+1, pady=10)
@@ -125,7 +136,7 @@ class AHPGUI(tk.Toplevel):
         ToolTip(self.btn_toggle_theme, "Alterna entre modo oscuro y tema por defecto.")
 
     def calcular_ahp(self):
-        # Resetea el estilo de las entradas a valor por defecto antes de validar
+        # Restablecer el estilo de las entradas a por defecto antes de validar
         for i in range(self.n):
             for j in range(self.n):
                 if i < j:
