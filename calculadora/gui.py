@@ -45,10 +45,12 @@ class LauncherGUI(tk.Tk):
         self.tree_adversary = ttk.Treeview(frame_adversary)
         self.tree_adversary.heading("#0", text="Estructura de Unidades Adversarias", anchor="w")
         self.tree_adversary.pack(expand=True, fill="both", padx=5, pady=5)
-        for padre, hijos in get_adversary_structure():
-            nodo = self.tree_adversary.insert("", "end", text=padre, open=False)
-            for hijo in hijos:
-                self.tree_adversary.insert(nodo, "end", text=hijo, open=False)
+        # Actualizamos la iteración para la nueva estructura de adversarios:
+        for grupo in get_adversary_structure():
+            nodo = self.tree_adversary.insert("", "end", text=grupo["unidad_superior"], open=False)
+            for sub in grupo["subordinados"]:
+                hijo_text = sub.get("unidad_subordinada", "")
+                self.tree_adversary.insert(nodo, "end", text=hijo_text, open=False)
 
         btn_launch = ttk.Button(frame_main, text="Ingresar a la Calculadora", command=self.launch_calculator)
         btn_launch.grid(row=1, column=0, columnspan=2, pady=10)
@@ -59,7 +61,7 @@ class LauncherGUI(tk.Tk):
 
 # ----------------------------------------------------------------------
 # Ventana de la Calculadora
-# Ahora solo se tiene la pestaña "Agregar Unidades" para Fuerza Propia y Adversaria
+# Contiene las pestañas "Agregar Unidades" para Fuerza Propia y Adversaria,
 # y un botón para abrir la ventana de carga de tropas registradas.
 # ----------------------------------------------------------------------
 class CalculatorGUI(tk.Toplevel):
@@ -77,7 +79,6 @@ class CalculatorGUI(tk.Toplevel):
         self.frame_own.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
         self.frame_own.grid_rowconfigure(0, weight=1)
         self.frame_own.grid_columnconfigure(0, weight=1)
-        # Únicamente una pestaña "Agregar Unidades"
         self.notebook_own = ttk.Notebook(self.frame_own)
         self.notebook_own.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
         self.tab_agregar_own = ttk.Frame(self.notebook_own)
@@ -90,7 +91,6 @@ class CalculatorGUI(tk.Toplevel):
         self.frame_adv.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
         self.frame_adv.grid_rowconfigure(0, weight=1)
         self.frame_adv.grid_columnconfigure(0, weight=1)
-        # Únicamente una pestaña "Agregar Unidades"
         self.notebook_adv = ttk.Notebook(self.frame_adv)
         self.notebook_adv.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
         self.tab_agregar_adv = ttk.Frame(self.notebook_adv)
@@ -223,9 +223,8 @@ class CalculatorGUI(tk.Toplevel):
 # ----------------------------------------------------------------------
 # Ventana para Cargar Tropas Registradas
 # Presenta dos pestañas: una con las tropas de Fuerza Propia y otra con la
-# estructura de Fuerza Adversaria. Al seleccionar un registro se mapea a la
-# estructura simplificada de la Calculadora (se asignan valores por defecto
-# en los subfactores).
+# estructura de Fuerza Adversaria (formateada en un Treeview con múltiples columnas).
+# Al seleccionar un registro se asignan valores por defecto a los subfactores.
 # ----------------------------------------------------------------------
 class CargarTropasGUI(tk.Toplevel):
     def __init__(self, calculator):
@@ -244,7 +243,7 @@ class CargarTropasGUI(tk.Toplevel):
         notebook.add(self.tab_friendly, text="Fuerza Propia")
         self.crear_panel_friendly(self.tab_friendly)
 
-        # Pestaña para Fuerza Adversaria
+        # Pestaña para Fuerza Adversaria (versión con columnas)
         self.tab_adversary = ttk.Frame(notebook)
         notebook.add(self.tab_adversary, text="Fuerza Adversaria")
         self.crear_panel_adversary(self.tab_adversary)
@@ -274,13 +273,13 @@ class CargarTropasGUI(tk.Toplevel):
             return
         data = self.tree_friendly.item(selected[0])["values"]
         try:
-            # Mapeo: se toma el campo "UF" como Tipo y "Cantidad UF" como Cantidad.
+            # Mapeo: se usa el campo "UF" como Tipo y "Cantidad UF" como Cantidad
             tipo = data[2]  # Campo "UF"
             cantidad = float(data[3])
         except (IndexError, ValueError):
             messagebox.showerror("Error", "Datos inválidos en la tropa seleccionada.")
             return
-        # Asignar valores por defecto (por ejemplo, 1.0) a los subfactores.
+        # Asigna valores por defecto (por ejemplo, 1.0) a los subfactores.
         nuevos_valores = [tipo, cantidad, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
         self.calculator.inputs_own["tree"].insert("", "end", values=nuevos_valores)
         self.calculator.recalcular_totales()
@@ -289,14 +288,26 @@ class CargarTropasGUI(tk.Toplevel):
     def crear_panel_adversary(self, parent):
         parent.grid_rowconfigure(0, weight=1)
         parent.grid_columnconfigure(0, weight=1)
-        self.tree_adversary = ttk.Treeview(parent)
-        self.tree_adversary.heading("#0", text="Estructura de Unidades Adversarias", anchor="w")
+        columns = ("Unidad Subordinada", "Pequeña Unidad", "Cantidad", "Tipo de Medios", "Cant Medios/UF")
+        self.tree_adversary = ttk.Treeview(parent, columns=columns, show="tree headings")
+        self.tree_adversary.heading("#0", text="Unidad Superior", anchor="w")
+        self.tree_adversary.column("#0", width=200, anchor="w")
+        for col in columns:
+            self.tree_adversary.heading(col, text=col, anchor="center")
+            self.tree_adversary.column(col, width=150, anchor="center")
         self.tree_adversary.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
-        # Cargar la estructura adversaria
-        for padre, hijos in get_adversary_structure():
-            nodo = self.tree_adversary.insert("", "end", text=padre, open=True)
-            for hijo in hijos:
-                self.tree_adversary.insert(nodo, "end", text=hijo, open=True)
+
+        for grupo in get_adversary_structure():
+            nodo = self.tree_adversary.insert("", "end", text=grupo["unidad_superior"], open=True, values=("", "", "", "", ""))
+            for sub in grupo["subordinados"]:
+                values = (
+                    sub.get("unidad_subordinada", ""),
+                    sub.get("pequena_unidad", ""),
+                    sub.get("cantidad", ""),
+                    sub.get("tipo_medios", ""),
+                    sub.get("cantidad_medios_por_uf", "")
+                )
+                self.tree_adversary.insert(nodo, "end", text="", values=values)
         btn_cargar = ttk.Button(parent, text="Cargar a Calculadora", command=self.cargar_adversary)
         btn_cargar.grid(row=1, column=0, pady=5)
 
@@ -309,18 +320,24 @@ class CargarTropasGUI(tk.Toplevel):
         if self.tree_adversary.get_children(selected[0]):
             messagebox.showerror("Error", "Seleccione un nodo hoja para cargar.")
             return
-        tipo = self.tree_adversary.item(selected[0])["text"]
+        item_data = self.tree_adversary.item(selected[0])
+        if not item_data["text"]:
+            if item_data["values"]:
+                tipo = item_data["values"][0]
+            else:
+                messagebox.showerror("Error", "No se pudo determinar la unidad adversaria.")
+                return
+        else:
+            tipo = item_data["text"]
         cantidad = 1.0  # Valor por defecto
         nuevos_valores = [tipo, cantidad, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
         self.calculator.inputs_adv["tree"].insert("", "end", values=nuevos_valores)
         self.calculator.recalcular_totales()
         messagebox.showinfo("Carga Exitosa", "Tropa de Fuerza Adversaria cargada a la Calculadora.")
 
+# ----------------------------------------------------------------------
+# Inicio de la aplicación
+# ----------------------------------------------------------------------
 if __name__ == "__main__":
-    import tkinter as tk
-    # Se crea una ventana raíz y se oculta (ya que la Calculadora es una Toplevel)
-    root = tk.Tk()
-    root.withdraw()
-    # Se instancia la calculadora sin ventana padre (o con parent=None)
-    calculator = CalculatorGUI(parent=None)
-    calculator.mainloop()
+    app = LauncherGUI()
+    app.mainloop()
