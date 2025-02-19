@@ -174,7 +174,7 @@ class AHPGUI(tk.Toplevel):
             plt.show()
 
         except ValueError as ve:
-            messagebox.showerror("Error", f"Por favor ingresa valores numéricos válidos en la matriz.\nDetalle: {ve}")
+            messagebox.showerror("Error", f"Por favor, ingresa valores numéricos válidos en la matriz.\nDetalle: {ve}")
 
     def toggle_theme(self):
         self.dark_mode = not self.dark_mode

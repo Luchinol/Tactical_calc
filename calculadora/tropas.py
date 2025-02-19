@@ -143,7 +143,7 @@ adversary_structure = [
                 "ahp": [3.0, 3.0, 3.0, 3.5, 3.0, 3.0]
             },
             {
-                "unidad_subordinada": "Compañía de transmisiones N°5252",
+                "unidad_subordinada": "Compañía de transmisiones N°5355",
                 "pequeña_unidad": None,
                 "cantidad": None,
                 "tipo_medios": None,
