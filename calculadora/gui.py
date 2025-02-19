@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from calculadora.tropas import get_friendly_forces, get_adversary_structure
+from calculadora.controllers.calculator_controller import CalculatorController
 
 # ----------------------------------------------------------------------
 # Ventana de Lanzador (Launcher)
@@ -74,6 +75,9 @@ class CalculatorGUI(tk.Toplevel):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
+        # Inicializar el controlador de la calculadora para separar la lógica de negocio
+        self.calc_controller = CalculatorController()
+
         # Panel para Fuerza Propia
         self.frame_own = ttk.LabelFrame(self, text="Fuerza Propia")
         self.frame_own.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
@@ -117,7 +121,7 @@ class CalculatorGUI(tk.Toplevel):
         btn_ahp.grid(row=3, column=0, columnspan=2, pady=10)
 
     def abrir_ahp(self):
-        from calculadora.ahp import AHPGUI  # Asegúrate de que 'ahp.py' esté en el mismo paquete 'calculadora'
+        from calculadora.ahp import AHPGUI  # Asegúrate que 'ahp.py' esté en el mismo paquete 'calculadora'
         AHPGUI(self)
 
     def on_close(self):
@@ -185,7 +189,7 @@ class CalculatorGUI(tk.Toplevel):
             integracion_medios = float(inputs["Integracion Medios"].get())
             integracion_apoyos = float(inputs["Integracion Apoyos"].get())
             valores = [tipo, cantidad, movilidad, combate, celeridad, flexibilidad,
-                        integracion_medios, integracion_apoyos]
+                       integracion_medios, integracion_apoyos]
             inputs["tree"].insert("", "end", values=valores)
             inputs["Cantidad"].delete(0, tk.END)
             inputs["Movilidad"].delete(0, tk.END)
@@ -199,29 +203,14 @@ class CalculatorGUI(tk.Toplevel):
             messagebox.showerror("Error de entrada", "Por favor, ingresa valores numéricos válidos.")
 
     def recalcular_totales(self):
-        total_own = self.calcular_total(self.inputs_own["tree"])
-        total_adv = self.calcular_total(self.inputs_adv["tree"])
+        # Recopilar datos de cada treeview: se obtiene una lista de listas
+        own_units = [self.inputs_own["tree"].item(child)["values"] for child in self.inputs_own["tree"].get_children()]
+        adv_units = [self.inputs_adv["tree"].item(child)["values"] for child in self.inputs_adv["tree"].get_children()]
+        total_own = self.calc_controller.calculate_total(own_units)
+        total_adv = self.calc_controller.calculate_total(adv_units)
         self.label_total_own.config(text=f"Total Fuerza Propia: {total_own:.2f}")
         self.label_total_adv.config(text=f"Total Fuerza Adversaria: {total_adv:.2f}")
         self.label_advantage.config(text=f"Ventaja de Maniobra: {(total_own - total_adv):.2f}")
-
-    def calcular_total(self, tree):
-        total = 0.0
-        for child in tree.get_children():
-            valores = tree.item(child)["values"]
-            try:
-                cantidad = float(valores[1])
-                movilidad = float(valores[2])
-                combate = float(valores[3])
-                celeridad = float(valores[4])
-                flexibilidad = float(valores[5])
-                integracion_medios = float(valores[6])
-                integracion_apoyos = float(valores[7])
-                puntaje = cantidad * (movilidad + combate + celeridad + flexibilidad + integracion_medios + integracion_apoyos)
-                total += puntaje
-            except (ValueError, IndexError):
-                continue
-        return total
 
     def abrir_cargar_tropas(self):
         CargarTropasGUI(self)
@@ -357,7 +346,7 @@ class CargarTropasGUI(tk.Toplevel):
         messagebox.showinfo("Carga Exitosa", "Tropa de Fuerza Adversaria cargada a la Calculadora.")
 
 # ----------------------------------------------------------------------
-# Inicio de la aplicación
+# Inicio de la aplicación (para pruebas independientes)
 # ----------------------------------------------------------------------
 if __name__ == "__main__":
     app = LauncherGUI()
