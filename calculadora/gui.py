@@ -137,29 +137,43 @@ class CalculatorGUI(tk.Toplevel):
 
         panel_entrada = ttk.Frame(container)
         panel_entrada.grid(row=0, column=0, sticky="nw")
+
+        # Definir las categorías OTAN y sus subcategorías
+        categories_otan = {
+            "Infantería": ["Infantería Mecanizada", "Infantería Blindada", "Infantería Motorizada"],
+            "Caballería": ["Caballería Blindada", "Caballería Mecanizada"],
+            "Artillería": ["Obuses Autopropulsados", "Artillería de Campaña"],
+            "Ingeniería": ["Unidad de Ingenieros"],
+            "Logística": ["Unidad Logística"]
+        }
+        # Generar la lista de opciones combinando categoría y subcategoría
+        options = [f"{cat} - {sub}" for cat, subs in categories_otan.items() for sub in subs]
+
         ttk.Label(panel_entrada, text="Tipo de Unidad:").grid(row=0, column=0, sticky="w", pady=2)
-        tipo_combo = ttk.Combobox(panel_entrada, values=["Infantes", "Tanques"], state="readonly", width=12)
+        tipo_combo = ttk.Combobox(panel_entrada, values=options, state="readonly", width=25)
         tipo_combo.grid(row=0, column=1, padx=5, pady=2)
         tipo_combo.current(0)
         inputs["Tipo"] = tipo_combo
 
+        # Resto de los widgets para ingresar otros campos
         ttk.Label(panel_entrada, text="Cantidad:").grid(row=1, column=0, sticky="w", pady=2)
         cantidad_entry = ttk.Entry(panel_entrada, width=14)
         cantidad_entry.grid(row=1, column=1, padx=5, pady=2)
         inputs["Cantidad"] = cantidad_entry
 
-        subfactores = ["Movilidad", "Combate Nocturno", "Celeridad", "Flexibilidad", "Integracion Medios", "Integracion Apoyos"]
+        subfactores = ["Movilidad", "Combate Nocturno", "Celeridad", "Flexibilidad",
+                       "Integracion Medios", "Integracion Apoyos"]
         for idx, subf in enumerate(subfactores):
-            ttk.Label(panel_entrada, text=f"{subf}:").grid(row=idx+2, column=0, sticky="w", pady=2)
+            ttk.Label(panel_entrada, text=f"{subf}:").grid(row=idx + 2, column=0, sticky="w", pady=2)
             entry = ttk.Entry(panel_entrada, width=14)
-            entry.grid(row=idx+2, column=1, padx=5, pady=2)
+            entry.grid(row=idx + 2, column=1, padx=5, pady=2)
             inputs[subf] = entry
 
         if is_own:
             btn = ttk.Button(panel_entrada, text="Agregar Unidad", command=self.agregar_unidad_own)
         else:
             btn = ttk.Button(panel_entrada, text="Agregar Unidad", command=self.agregar_unidad_adv)
-        btn.grid(row=len(subfactores)+2, column=0, columnspan=2, pady=5)
+        btn.grid(row=len(subfactores) + 2, column=0, columnspan=2, pady=5)
 
         columnas = ("Tipo", "Cantidad", "Movilidad", "Combate Nocturno", "Celeridad",
                     "Flexibilidad", "Integracion Medios", "Integracion Apoyos")
